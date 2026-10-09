@@ -65,7 +65,8 @@
 <label class="block mt-2">PACKAGES (plan + price)</label>
 <div id="pkgs" class="space-y-2 mt-1"></div>
 <button onclick="addPkgRow()" class="mt-2 text-[12px] bg-white/10 border border-white/20 px-3 py-1.5 rounded-lg">+ Add package</button>
-<button onclick="addProduct()" class="w-full mt-3 bg-green-400 text-black font-extrabold py-2.5 rounded-xl">SAVE PRODUCT</button>
+<button id="saveBtn" onclick="addProduct()" class="w-full mt-3 bg-green-400 text-black font-extrabold py-2.5 rounded-xl">SAVE PRODUCT</button>
+<button id="cancelEdit" style="display:none" onclick="cancelEdit()" class="w-full mt-2 text-[12px] text-slate-400 py-2">Cancel edit</button>
 <h2 class="font-bold text-[13px] mt-4"><i class="fa-solid fa-clipboard-list"></i> Products list</h2>
 <div id="plist" class="text-[12px] mt-2 space-y-2 text-slate-300">Loading&#8230;</div>
 </div>
@@ -152,6 +153,40 @@ function pickImg(inp){
  const r=new FileReader(); r.onload=e=>{document.getElementById('pimgPrev').src=e.target.result;document.getElementById('pimgPrev').style.display='block';document.getElementById('pimgTxt').textContent=f.name}; r.readAsDataURL(f);
 }
 function urlPrev(v){ if(v&&/^https:\/\//.test(v)){document.getElementById('pimgPrev').src=v;document.getElementById('pimgPrev').style.display='block';document.getElementById('pimgTxt').textContent='URL image'} }
+let editingKey=null;
+function renderProducts(p){
+ const el=document.getElementById('plist');
+ if(!p){el.innerHTML='(empty - add your first entry)';return}
+ el.innerHTML=Object.entries(p).reverse().slice(0,20).map(([k,v])=>`<div class="bg-black/30 border border-white/10 rounded-lg p-2 flex justify-between items-center"><span>\u2022 ${v.name||'?'} ${(v.packages&&v.packages.length)?v.packages.length+' plans':''}</span><span class="flex gap-2"><button onclick="editProduct('${k}')" class="text-cyan-300 text-[11px]">Edit</button><button onclick="delItem('products','${k}')" class="text-red-400 text-[11px]">Delete</button></span></div>`).join('');
+}
+async function editProduct(key){
+ try{
+  const s=await fbDB().ref('products/'+key).once('value'); const p=s.val();
+  if(!p)return alert('Not found');
+  document.getElementById('pn').value=p.name||'';
+  document.getElementById('pc').value=p.cat||'';
+  document.getElementById('ps').value=p.status||'online';
+  document.getElementById('pnote').value=p.note||'';
+  document.getElementById('pf').value=(p.features||[]).join('\n');
+  document.getElementById('pkgs').innerHTML='';
+  (p.packages&&p.packages.length?p.packages:[{label:'',price:''}]).forEach(x=>addPkgRow(x.label,x.price));
+  document.getElementById('pimg').value='';
+  document.getElementById('pimgUrl').value=p.image||'';
+  if(p.image){document.getElementById('pimgPrev').src=p.image;document.getElementById('pimgPrev').style.display='block'}
+  editingKey=key;
+  document.getElementById('saveBtn').textContent='UPDATE PRODUCT';
+  document.getElementById('cancelEdit').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+ }catch(e){alert('Fail: '+e.message)}
+}
+function cancelEdit(){
+ editingKey=null;
+ document.getElementById('pn').value='';document.getElementById('pkgs').innerHTML='';addPkgRow();
+ document.getElementById('pimg').value='';document.getElementById('pimgUrl').value='';
+ document.getElementById('pimgPrev').style.display='none';
+ document.getElementById('saveBtn').textContent='SAVE PRODUCT';
+ document.getElementById('cancelEdit').style.display='none';
+}
 async function addProduct(){
  const pkgs=[...document.querySelectorAll('#pkgs > div')].map(d=>({label:d.querySelector('.plabel').value.trim(),price:parseFloat(d.querySelector('.pprice').value)||0})).filter(x=>x.label&&x.price>0);
  const o={name:document.getElementById('pn').value.trim(),cat:document.getElementById('pc').value,status:document.getElementById('ps').value,note:document.getElementById('pnote').value.trim(),features:document.getElementById('pf').value.split('\n').map(s=>s.trim()).filter(Boolean),packages:pkgs,price:pkgs.length?pkgs[0].price:0,time:Date.now()};
@@ -167,8 +202,8 @@ async function addProduct(){
   } else if(f){
    o.image=await uploadToImgbb(f);
   }
-  await fbDB().ref('products').push(o);
-  alert('Saved!');
+  if(editingKey){await fbDB().ref('products/'+editingKey).update(o);alert('Updated!');editingKey=null;document.getElementById('saveBtn').textContent='SAVE PRODUCT';document.getElementById('cancelEdit').style.display='none';}
+  else{await fbDB().ref('products').push(o);alert('Saved!');}
   document.getElementById('pn').value='';document.getElementById('pkgs').innerHTML='';addPkgRow();
   document.getElementById('pimg').value='';document.getElementById('pimgUrl').value='';
   document.getElementById('pimgPrev').style.display='none';document.getElementById('pimgTxt').innerHTML='<i class="fa-solid fa-image"></i> Click to upload image';
@@ -262,7 +297,7 @@ async function banUser(uid,ban){
 async function loadAll(){
  try{
   const p=await fbGet('products'), u=await fbGet('updates');
-  renderList('plist',p,'name'); renderList('ulist',u,'title',true);
+  renderProducts(p); renderList('ulist',u,'title',true);
  }catch(e){ document.getElementById('plist').innerHTML='Load fail: '+e.message; document.getElementById('ulist').innerHTML='Load fail: '+e.message; }
 }
 function renderList(id,obj,label,withDel){
