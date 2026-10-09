@@ -10,16 +10,16 @@
 <body><div class="box">
 <img src="IMG-20260805-WA0005.jpg" alt="GOUROB X CHEAT" class="w-16 h-16 rounded-2xl object-cover border border-red-500/60 mx-auto">
 <h1 class="text-center font-black tracking-widest mt-2">GOUROB <span class="text-red-500">X</span> CHEAT <span class="text-cyan-300 text-sm">ADMIN</span></h1>
-<p class="text-center text-[11px] text-slate-400">Separate from store â€¢ Admins only â€¢ Legal products/updates only</p>
+<p class="text-center text-[11px] text-slate-400">Separate from store • Admins only • Legal products/updates only</p>
 
 <!-- GATE: 2 admin emails only, no demo code -->
 <div id="gate" class="glass p-5 mt-4">
 <label>ADMIN EMAIL</label>
 <input id="aemail" class="field mt-1" placeholder="admin@mail.com">
 <label class="block mt-2">PASSWORD</label>
-<input id="apass" type="password" class="field mt-1" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
+<input id="apass" type="password" class="field mt-1" placeholder="••••••••">
 <button onclick="authLogin()" class="w-full mt-3 bg-cyan-400 text-black font-extrabold py-2.5 rounded-xl">LOGIN</button>
-<p class="text-[10px] text-slate-500 mt-2">Only 2 admin emails allowed. Do not upload or sell game-cheat APKs â€” violates game Terms.</p>
+<p class="text-[10px] text-slate-500 mt-2">Only 2 admin emails allowed. Do not upload or sell game-cheat APKs — violates game Terms.</p>
 </div>
 
 <!-- PANEL -->
@@ -45,45 +45,45 @@
 <img id="pimgPrev" src="" style="display:none" class="w-24 h-24 rounded-xl object-cover border border-cyan-400/50">
 <span id="pimgTxt" class="text-cyan-300"><i class="fa-solid fa-image"></i> Click to upload image</span>
 </label>
-<label class="block mt-2">Or paste IMAGE URL (https://â€¦)</label>
+<label class="block mt-2">Or paste IMAGE URL (https://…)</label>
 <input id="pimgUrl" class="field mt-1" placeholder="https://example.com/image.png" oninput="urlPrev(this.value)">
 <p class="text-[10px] text-slate-500 mt-1">A pasted URL is saved directly; an uploaded file goes to Storage.</p>
-<label class="block mt-2">BADGE NOTE (e.g. VIP EDITION â€¢ Instant)</label><input id="pnote" class="field mt-1" placeholder="VIP EDITION">
+<label class="block mt-2">BADGE NOTE (e.g. VIP EDITION • Instant)</label><input id="pnote" class="field mt-1" placeholder="VIP EDITION">
 <label class="block mt-2">FEATURES (one per line)</label><textarea id="pf" rows="3" class="field mt-1" placeholder="100% Anti-Ban&#10;24/7 Support&#10;Instant Delivery"></textarea>
 <label class="block mt-2">PACKAGES (plan + price)</label>
 <div id="pkgs" class="space-y-2 mt-1"></div>
 <button onclick="addPkgRow()" class="mt-2 text-[12px] bg-white/10 border border-white/20 px-3 py-1.5 rounded-lg">+ Add package</button>
 <button onclick="addProduct()" class="w-full mt-3 bg-green-400 text-black font-extrabold py-2.5 rounded-xl">SAVE PRODUCT</button>
 <h2 class="font-bold text-[13px] mt-4"><i class="fa-solid fa-clipboard-list"></i> Products list</h2>
-<div id="plist" class="text-[12px] mt-2 space-y-2 text-slate-300">Loadingâ€¦</div>
+<div id="plist" class="text-[12px] mt-2 space-y-2 text-slate-300">Loading…</div>
 </div>
 
 <div id="tabC" class="glass p-4 mt-3" style="display:none">
 <h2 class="font-bold text-[13px]"><i class="fa-solid fa-tags"></i> Categories</h2>
 <div class="flex gap-2 mt-2"><input id="cn" class="field" placeholder="e.g. Android Non Root"><button onclick="addCat()" class="bg-green-400 text-black font-bold px-4 rounded-xl text-[13px]">ADD</button></div>
 <div class="flex gap-2 mt-2"><input id="ck" class="field" placeholder="key: android (small letter)"><button class="opacity-0 px-1">.</button></div>
-<p class="text-[10px] text-slate-500">key = lowercase unique id (android/ios/pcâ€¦), Name = display name</p>
-<div id="clist" class="text-[12px] mt-3 space-y-2">Loadingâ€¦</div>
+<p class="text-[10px] text-slate-500">key = lowercase unique id (android/ios/pc…), Name = display name</p>
+<div id="clist" class="text-[12px] mt-3 space-y-2">Loading…</div>
 </div>
 
 <div id="tabU" class="glass p-4 mt-3" style="display:none">
-<h2 class="font-bold text-[13px]"><i class="fa-solid fa-plus"></i> New Update entry (APK/link â€” legal apps only)</h2>
+<h2 class="font-bold text-[13px]"><i class="fa-solid fa-plus"></i> New Update entry (APK/link — legal apps only)</h2>
 <label class="block mt-2">TITLE</label><input id="un" class="field mt-1" placeholder="Demo App v2.1">
-<label class="block mt-2">NOTE / VERSION</label><input id="uv" class="field mt-1" placeholder="Bug fix â€¢ 12MB">
-<label class="block mt-2">DOWNLOAD LINK (https://â€¦ legal only)</label><input id="ul" class="field mt-1" placeholder="https://â€¦">
+<label class="block mt-2">NOTE / VERSION</label><input id="uv" class="field mt-1" placeholder="Bug fix • 12MB">
+<label class="block mt-2">DOWNLOAD LINK (https://… legal only)</label><input id="ul" class="field mt-1" placeholder="https://…">
 <button onclick="addUpdate()" class="w-full mt-3 bg-blue-500 font-extrabold py-2.5 rounded-xl">SAVE UPDATE</button>
 <h2 class="font-bold text-[13px] mt-4"><i class="fa-solid fa-clipboard-list"></i> Updates list</h2>
-<div id="ulist" class="text-[12px] mt-2 space-y-2 text-slate-300">Loadingâ€¦</div>
+<div id="ulist" class="text-[12px] mt-2 space-y-2 text-slate-300">Loading…</div>
 </div>
 <div id="tabF" class="glass p-4 mt-3" style="display:none">
 <h2 class="font-bold text-[13px]"><i class="fa-solid fa-sack-dollar"></i> Fund Requests (approving adds balance)</h2>
 <p class="text-[10px] text-slate-500">Before approving, verify the payment + TrxID in the bKash/Nagad app.</p>
 <h3 class="text-[11px] font-bold text-yellow-300 mt-3"><i class="fa-solid fa-clock"></i> PENDING</h3>
-<div id="fpend" class="text-[12px] mt-2 space-y-2">Loadingâ€¦</div>
+<div id="fpend" class="text-[12px] mt-2 space-y-2">Loading…</div>
 <h3 class="text-[11px] font-bold text-slate-400 mt-3">Recent decided</h3>
-<div id="fhist" class="text-[11px] mt-2 space-y-1 text-slate-400">â€”</div>
+<div id="fhist" class="text-[11px] mt-2 space-y-1 text-slate-400">—</div>
 </div>
-<a href="dashboard.html" class="block text-center text-[12px] text-slate-400 mt-4">â† Back to Store</a>
+<a href="dashboard.html" class="block text-center text-[12px] text-slate-400 mt-4">← Back to Store</a>
 </div></div>
 
 <script src="firebase-config.js"></script>
@@ -99,7 +99,7 @@ function tab(t){['P','U','F','C'].forEach(x=>document.getElementById('tab'+x).st
 async function authLogin(){try{const c=await firebase.auth().signInWithEmailAndPassword(document.getElementById('aemail').value.trim(),document.getElementById('apass').value);if(!ADMINS.includes(c.user.email)){alert('This email is not an admin');await firebase.auth().signOut()}else show()}catch(e){alert('Login fail: '+e.message)}}
 function addPkgRow(l='',p=''){
  const d=document.createElement('div'); d.className='flex gap-2';
- d.innerHTML=`<input class="field plabel" placeholder="Plan (e.g. 1 Hours)" value="${l}"><input type="number" class="field pprice" placeholder="à§³" value="${p}" style="max-width:110px"><button onclick="this.parentElement.remove()" class="text-red-400 px-2"><i class="fa-solid fa-xmark"></i></button>`;
+ d.innerHTML=`<input class="field plabel" placeholder="Plan (e.g. 1 Hours)" value="${l}"><input type="number" class="field pprice" placeholder="৳" value="${p}" style="max-width:110px"><button onclick="this.parentElement.remove()" class="text-red-400 px-2"><i class="fa-solid fa-xmark"></i></button>`;
  document.getElementById('pkgs').appendChild(d);
 }
 async function addCat(){
@@ -111,8 +111,8 @@ async function loadCats(){
  try{
   const v=await fbGet('categories');
   const box=document.getElementById('clist'), sel=document.getElementById('pc');
-  if(!v){box.innerHTML='(empty)';sel.innerHTML='<option value="">â€”</option>';return}
-  box.innerHTML=Object.entries(v).map(([k,c])=>`<div class="bg-black/30 border border-white/10 rounded-lg p-2 flex justify-between items-center"><span>â€¢ ${c.name} <span class="text-slate-500">(${k})</span></span><button onclick="delItem('categories','${k}')" class="text-red-400 text-[11px]">Delete</button></div>`).join('');
+  if(!v){box.innerHTML='(empty)';sel.innerHTML='<option value="">—</option>';return}
+  box.innerHTML=Object.entries(v).map(([k,c])=>`<div class="bg-black/30 border border-white/10 rounded-lg p-2 flex justify-between items-center"><span>• ${c.name} <span class="text-slate-500">(${k})</span></span><button onclick="delItem('categories','${k}')" class="text-red-400 text-[11px]">Delete</button></div>`).join('');
   sel.innerHTML=Object.entries(v).map(([k,c])=>`<option value="${k}">${c.name}</option>`).join('');
  }catch(e){document.getElementById('clist').innerHTML='Load fail: '+e.message}
 }
@@ -157,7 +157,7 @@ async function addUpdate(){
   if(link&&!/^https:\/\//.test(link))return alert('Link must start with https://');
  const o={title:document.getElementById('un').value.trim(),note:document.getElementById('uv').value.trim(),link,time:Date.now()};
   if(!o.title)return alert('Enter title');
- try{await fbDB().ref('updates').push(o);alert('Saved âœ…')}catch(e){alert('Save fail: '+e.message)}
+ try{await fbDB().ref('updates').push(o);alert('Saved ✅')}catch(e){alert('Save fail: '+e.message)}
  loadAll();
 }
 function loadFunds(){
@@ -167,18 +167,18 @@ function loadFunds(){
   document.getElementById('fcount').textContent=n||'';
   if(!v){box.innerHTML='No pending';return}
   box.innerHTML=Object.entries(v).reverse().map(([k,x])=>`<div class="bg-black/30 border border-yellow-500/30 rounded-lg p-2">
-   <div><b>à§³${x.amount}</b> via ${x.method} â€¢ ${x.txn||'no-trx'}</div>
-   <div class="text-slate-400 text-[11px]">${x.email||''} â€¢ ${x.time?new Date(x.time).toLocaleString():''}</div>
+   <div><b>৳${x.amount}</b> via ${x.method} • ${x.txn||'no-trx'}</div>
+   <div class="text-slate-400 text-[11px]">${x.email||''} • ${x.time?new Date(x.time).toLocaleString():''}</div>
    <div class="flex gap-2 mt-2"><button onclick="approveFund('${k}','${x.uid}',${x.amount})" class="flex-1 bg-green-500 text-black font-bold py-1.5 rounded-lg text-[12px]"><i class="fa-solid fa-check"></i> Approve</button><button onclick="rejectFund('${k}')" class="flex-1 bg-red-500/20 border border-red-500/50 text-red-300 py-1.5 rounded-lg text-[12px]"><i class="fa-solid fa-xmark"></i> Reject</button></div>
   </div>`).join('');
  });
  fbDB().ref('fundRequests').orderByChild('time').limitToLast(8).on('value',s=>{
   const v=s.val(); if(!v)return;
-  document.getElementById('fhist').innerHTML=Object.values(v).reverse().filter(x=>x.status!=='pending').slice(0,8).map(x=>`â€¢ à§³${x.amount} ${x.email||''} â€” <b>${x.status}</b>`).join('<br>')||'â€”';
+  document.getElementById('fhist').innerHTML=Object.values(v).reverse().filter(x=>x.status!=='pending').slice(0,8).map(x=>`• ৳${x.amount} ${x.email||''} — <b>${x.status}</b>`).join('<br>')||'—';
  });
 }
 async function approveFund(key,uid,amount){
- if(!confirm('Approve à§³'+amount+' and add to wallet?'))return;
+ if(!confirm('Approve ৳'+amount+' and add to wallet?'))return;
  try{
   await fbDB().ref('wallets/'+uid).transaction(b=>(parseFloat(b)||0)+parseFloat(amount));
   await fbDB().ref('fundRequests/'+key).update({status:'approved',by:firebase.auth().currentUser.email,at:Date.now()});
@@ -196,8 +196,8 @@ async function loadAll(){
 }
 function renderList(id,obj,label,withDel){
  const el=document.getElementById(id);
- if(!obj){el.innerHTML='(empty â€” add your first entry)';return}
- el.innerHTML=Object.entries(obj).reverse().slice(0,20).map(([k,v])=>`<div class="bg-black/30 border border-white/10 rounded-lg p-2 flex justify-between items-center"><span>â€¢ ${v[label]||'?'} ${v.price?'â€” à§³'+v.price:''}</span><button onclick="delItem('${id==='plist'?'products':'updates'}','${k}')" class="text-red-400 text-[11px]">Delete</button></div>`).join('');
+ if(!obj){el.innerHTML='(empty — add your first entry)';return}
+ el.innerHTML=Object.entries(obj).reverse().slice(0,20).map(([k,v])=>`<div class="bg-black/30 border border-white/10 rounded-lg p-2 flex justify-between items-center"><span>• ${v[label]||'?'} ${v.price?'— ৳'+v.price:''}</span><button onclick="delItem('${id==='plist'?'products':'updates'}','${k}')" class="text-red-400 text-[11px]">Delete</button></div>`).join('');
 }
 async function delItem(path,key){ if(!confirm('Delete?'))return; try{await fbDB().ref(path+'/'+key).remove();loadAll();loadCats()}catch(e){alert('Delete fail: '+e.message)} }
 </script></body></html>
