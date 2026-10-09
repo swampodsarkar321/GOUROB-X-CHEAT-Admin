@@ -29,6 +29,7 @@
 <button onclick="tab('c')" class="flex-1 py-2 rounded-xl bg-white/5 border border-white/15 text-[12px] font-bold"><i class="fa-solid fa-tags"></i> Category</button>
 <button onclick="tab('u')" class="flex-1 py-2 rounded-xl bg-white/5 border border-white/15 text-[12px] font-bold"><i class="fa-solid fa-cloud-arrow-down"></i> Updates</button>
 <button onclick="tab('f')" class="flex-1 py-2 rounded-xl bg-white/5 border border-white/15 text-[12px] font-bold"><i class="fa-solid fa-sack-dollar"></i> Funds <span id="fcount" class="bg-red-500 text-white text-[10px] px-1.5 rounded-full"></span></button>
+<button onclick="tab('o')" class="flex-1 py-2 rounded-xl bg-white/5 border border-white/15 text-[12px] font-bold"><i class="fa-solid fa-cart-shopping"></i> Orders <span id="ocount" class="bg-red-500 text-white text-[10px] px-1.5 rounded-full"></span></button>
 <button onclick="lock()" class="px-4 py-2 rounded-xl bg-red-500/15 border border-red-500/40 text-[12px]">Lock</button>
 </div>
 
@@ -83,6 +84,13 @@
 <h3 class="text-[11px] font-bold text-slate-400 mt-3">Recent decided</h3>
 <div id="fhist" class="text-[11px] mt-2 space-y-1 text-slate-400">&#8212;</div>
 </div>
+<div id="tabO" class="glass p-4 mt-3" style="display:none">
+<h2 class="font-bold text-[13px]"><i class="fa-solid fa-cart-shopping"></i> Orders (approve to deliver, reject refunds wallet)</h2>
+<h3 class="text-[11px] font-bold text-yellow-300 mt-3"><i class="fa-solid fa-clock"></i> PENDING</h3>
+<div id="opend" class="text-[12px] mt-2 space-y-2">Loading&#8230;</div>
+<h3 class="text-[11px] font-bold text-slate-400 mt-3">Recent decided</h3>
+<div id="ohist" class="text-[11px] mt-2 space-y-1 text-slate-400">&#8212;</div>
+</div>
 <a href="dashboard.html" class="block text-center text-[12px] text-slate-400 mt-4">&#8592; Back to Store</a>
 </div></div>
 
@@ -90,12 +98,12 @@
 <script>
 const ADMINS=['gourobsarkar99@gmail.com','mdswampodsarkar@gmail.com'];
 function lock(){ firebase.auth().signOut().then(()=>location.reload()); }
-function show(){document.getElementById('gate').style.display='none';document.getElementById('panel').style.display='block';loadAll();loadFunds();loadCats();addPkgRow();addPkgRow()}
+function show(){document.getElementById('gate').style.display='none';document.getElementById('panel').style.display='block';loadAll();loadFunds();loadOrders();loadCats();addPkgRow();addPkgRow()}
 firebase.auth().onAuthStateChanged(u=>{
  if(u && ADMINS.includes(u.email)) show();
  else if(u){ alert('This email is not an admin'); firebase.auth().signOut(); }
 });
-function tab(t){['P','U','F','C'].forEach(x=>document.getElementById('tab'+x).style.display='none');document.getElementById('tab'+t.toUpperCase()).style.display='block'}
+function tab(t){['P','U','F','C','O'].forEach(x=>document.getElementById('tab'+x).style.display='none');document.getElementById('tab'+t.toUpperCase()).style.display='block'}
 async function authLogin(){try{const c=await firebase.auth().signInWithEmailAndPassword(document.getElementById('aemail').value.trim(),document.getElementById('apass').value);if(!ADMINS.includes(c.user.email)){alert('This email is not an admin');await firebase.auth().signOut()}else show()}catch(e){alert('Login fail: '+e.message)}}
 function addPkgRow(l='',p=''){
  const d=document.createElement('div'); d.className='flex gap-2';
@@ -187,6 +195,35 @@ async function approveFund(key,uid,amount){
 async function rejectFund(key){
  if(!confirm('Reject?'))return;
  try{await fbDB().ref('fundRequests/'+key).update({status:'rejected',by:firebase.auth().currentUser.email,at:Date.now()})}catch(e){alert('Fail: '+e.message)}
+}
+function loadOrders(){
+ fbDB().ref('orders').orderByChild('status').equalTo('pending').on('value',s=>{
+  const v=s.val(); const box=document.getElementById('opend');
+  const n=v?Object.keys(v).length:0;
+  document.getElementById('ocount').textContent=n||'';
+  if(!v){box.innerHTML='No pending orders';return}
+  box.innerHTML=Object.entries(v).reverse().map(([k,x])=>`<div class="bg-black/30 border border-yellow-500/30 rounded-lg p-2">
+   <div><b>${x.product||''}</b> - ${x.plan||''} x ${x.qty||1}</div>
+   <div class="text-cyan-300 font-bold">Total: \u09f3${x.total||0}</div>
+   <div class="text-slate-400 text-[11px]">${x.email||''} - ${x.time?new Date(x.time).toLocaleString():''}</div>
+   <div class="flex gap-2 mt-2"><button onclick="approveOrder('${k}')" class="flex-1 bg-green-500 text-black font-bold py-1.5 rounded-lg text-[12px]"><i class="fa-solid fa-check"></i> Approve</button><button onclick="rejectOrder('${k}','${x.uid}',${x.total||0})" class="flex-1 bg-red-500/20 border border-red-500/50 text-red-300 py-1.5 rounded-lg text-[12px]"><i class="fa-solid fa-xmark"></i> Reject + Refund</button></div>
+  </div>`).join('');
+ });
+ fbDB().ref('orders').orderByChild('time').limitToLast(8).on('value',s=>{
+  const v=s.val(); if(!v)return;
+  document.getElementById('ohist').innerHTML=Object.values(v).reverse().filter(x=>x.status!=='pending').slice(0,8).map(x=>`\u2022 ${x.product||''} (${x.plan||''} x ${x.qty||1}) - \u09f3${x.total||0} - <b>${x.status}</b>`).join('<br>')||'\u2014';
+ });
+}
+async function approveOrder(key){
+ if(!confirm('Approve this order (deliver)?'))return;
+ try{await fbDB().ref('orders/'+key).update({status:'approved',by:firebase.auth().currentUser.email,at:Date.now()})}catch(e){alert('Fail: '+e.message)}
+}
+async function rejectOrder(key,uid,total){
+ if(!confirm('Reject + refund \u09f3'+total+' to wallet?'))return;
+ try{
+  await fbDB().ref('wallets/'+uid).transaction(b=>(parseFloat(b)||0)+parseFloat(total));
+  await fbDB().ref('orders/'+key).update({status:'rejected',by:firebase.auth().currentUser.email,at:Date.now()});
+ }catch(e){alert('Fail: '+e.message)}
 }
 async function loadAll(){
  try{
