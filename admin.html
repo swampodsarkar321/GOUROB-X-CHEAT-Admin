@@ -1,0 +1,208 @@
+﻿<!DOCTYPE html>
+<html lang="bn"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin | GOUROB X CHEAT</title><link rel="icon" type="image/jpeg" href="IMG-20260805-WA0005.jpg"><script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<style>body{background:#05070f;color:#e8eef7}.box{max-width:480px;margin:0 auto;min-height:100vh;padding:16px 12px 60px}.glass{background:rgba(16,24,45,.9);border:1px solid rgba(255,255,255,.1);border-radius:16px}.field{width:100%;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:10px;font-size:13px;color:#fff;outline:none}.field:focus{border-color:#00f0ff}label{font-size:10px;font-weight:800;color:#8a96b0}.imgup{width:100%;background:rgba(0,0,0,.45);border:1px dashed rgba(0,240,255,.4);border-radius:12px;padding:14px;font-size:13px;color:#9fb;cursor:pointer}.imgup:hover{background:rgba(0,240,255,.08)}</style></head>
+<body><div class="box">
+<img src="IMG-20260805-WA0005.jpg" alt="GOUROB X CHEAT" class="w-16 h-16 rounded-2xl object-cover border border-red-500/60 mx-auto">
+<h1 class="text-center font-black tracking-widest mt-2">GOUROB <span class="text-red-500">X</span> CHEAT <span class="text-cyan-300 text-sm">ADMIN</span></h1>
+<p class="text-center text-[11px] text-slate-400">Separate from store â€¢ Admins only â€¢ Legal products/updates only</p>
+
+<!-- GATE: 2 admin emails only, no demo code -->
+<div id="gate" class="glass p-5 mt-4">
+<label>ADMIN EMAIL</label>
+<input id="aemail" class="field mt-1" placeholder="admin@mail.com">
+<label class="block mt-2">PASSWORD</label>
+<input id="apass" type="password" class="field mt-1" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
+<button onclick="authLogin()" class="w-full mt-3 bg-cyan-400 text-black font-extrabold py-2.5 rounded-xl">LOGIN</button>
+<p class="text-[10px] text-slate-500 mt-2">Only 2 admin emails allowed. Do not upload or sell game-cheat APKs â€” violates game Terms.</p>
+</div>
+
+<!-- PANEL -->
+<div id="panel" style="display:none">
+<div class="flex gap-2 mt-4 flex-wrap">
+<button onclick="tab('p')" class="flex-1 py-2 rounded-xl bg-cyan-400/15 border border-cyan-400/40 text-[12px] font-bold"><i class="fa-solid fa-box"></i> Products</button>
+<button onclick="tab('c')" class="flex-1 py-2 rounded-xl bg-white/5 border border-white/15 text-[12px] font-bold"><i class="fa-solid fa-tags"></i> Category</button>
+<button onclick="tab('u')" class="flex-1 py-2 rounded-xl bg-white/5 border border-white/15 text-[12px] font-bold"><i class="fa-solid fa-cloud-arrow-down"></i> Updates</button>
+<button onclick="tab('f')" class="flex-1 py-2 rounded-xl bg-white/5 border border-white/15 text-[12px] font-bold"><i class="fa-solid fa-sack-dollar"></i> Funds <span id="fcount" class="bg-red-500 text-white text-[10px] px-1.5 rounded-full"></span></button>
+<button onclick="lock()" class="px-4 py-2 rounded-xl bg-red-500/15 border border-red-500/40 text-[12px]">Lock</button>
+</div>
+
+<div id="tabP" class="glass p-4 mt-3">
+<h2 class="font-bold text-[13px]"><i class="fa-solid fa-plus"></i> New Product (with packages)</h2>
+<label class="block mt-2">NAME</label><input id="pn" class="field mt-1" placeholder="Product name">
+<div class="grid grid-cols-2 gap-2 mt-2">
+<div><label>CATEGORY</label><select id="pc" class="field mt-1"></select></div>
+<div><label>STATUS</label><select id="ps" class="field mt-1"><option value="online">ONLINE</option><option value="offline">OFFLINE</option></select></div>
+</div>
+<label class="block mt-2">PRODUCT PICTURE</label>
+<label class="imgup mt-1 flex flex-col items-center gap-1">
+<input id="pimg" type="file" accept="image/*" class="hidden" onchange="pickImg(this)">
+<img id="pimgPrev" src="" style="display:none" class="w-24 h-24 rounded-xl object-cover border border-cyan-400/50">
+<span id="pimgTxt" class="text-cyan-300"><i class="fa-solid fa-image"></i> Click to upload image</span>
+</label>
+<label class="block mt-2">Or paste IMAGE URL (https://â€¦)</label>
+<input id="pimgUrl" class="field mt-1" placeholder="https://example.com/image.png" oninput="urlPrev(this.value)">
+<p class="text-[10px] text-slate-500 mt-1">A pasted URL is saved directly; an uploaded file goes to Storage.</p>
+<label class="block mt-2">BADGE NOTE (e.g. VIP EDITION â€¢ Instant)</label><input id="pnote" class="field mt-1" placeholder="VIP EDITION">
+<label class="block mt-2">FEATURES (one per line)</label><textarea id="pf" rows="3" class="field mt-1" placeholder="100% Anti-Ban&#10;24/7 Support&#10;Instant Delivery"></textarea>
+<label class="block mt-2">PACKAGES (plan + price)</label>
+<div id="pkgs" class="space-y-2 mt-1"></div>
+<button onclick="addPkgRow()" class="mt-2 text-[12px] bg-white/10 border border-white/20 px-3 py-1.5 rounded-lg">+ Add package</button>
+<button onclick="addProduct()" class="w-full mt-3 bg-green-400 text-black font-extrabold py-2.5 rounded-xl">SAVE PRODUCT</button>
+<h2 class="font-bold text-[13px] mt-4"><i class="fa-solid fa-clipboard-list"></i> Products list</h2>
+<div id="plist" class="text-[12px] mt-2 space-y-2 text-slate-300">Loadingâ€¦</div>
+</div>
+
+<div id="tabC" class="glass p-4 mt-3" style="display:none">
+<h2 class="font-bold text-[13px]"><i class="fa-solid fa-tags"></i> Categories</h2>
+<div class="flex gap-2 mt-2"><input id="cn" class="field" placeholder="e.g. Android Non Root"><button onclick="addCat()" class="bg-green-400 text-black font-bold px-4 rounded-xl text-[13px]">ADD</button></div>
+<div class="flex gap-2 mt-2"><input id="ck" class="field" placeholder="key: android (small letter)"><button class="opacity-0 px-1">.</button></div>
+<p class="text-[10px] text-slate-500">key = lowercase unique id (android/ios/pcâ€¦), Name = display name</p>
+<div id="clist" class="text-[12px] mt-3 space-y-2">Loadingâ€¦</div>
+</div>
+
+<div id="tabU" class="glass p-4 mt-3" style="display:none">
+<h2 class="font-bold text-[13px]"><i class="fa-solid fa-plus"></i> New Update entry (APK/link â€” legal apps only)</h2>
+<label class="block mt-2">TITLE</label><input id="un" class="field mt-1" placeholder="Demo App v2.1">
+<label class="block mt-2">NOTE / VERSION</label><input id="uv" class="field mt-1" placeholder="Bug fix â€¢ 12MB">
+<label class="block mt-2">DOWNLOAD LINK (https://â€¦ legal only)</label><input id="ul" class="field mt-1" placeholder="https://â€¦">
+<button onclick="addUpdate()" class="w-full mt-3 bg-blue-500 font-extrabold py-2.5 rounded-xl">SAVE UPDATE</button>
+<h2 class="font-bold text-[13px] mt-4"><i class="fa-solid fa-clipboard-list"></i> Updates list</h2>
+<div id="ulist" class="text-[12px] mt-2 space-y-2 text-slate-300">Loadingâ€¦</div>
+</div>
+<div id="tabF" class="glass p-4 mt-3" style="display:none">
+<h2 class="font-bold text-[13px]"><i class="fa-solid fa-sack-dollar"></i> Fund Requests (approving adds balance)</h2>
+<p class="text-[10px] text-slate-500">Before approving, verify the payment + TrxID in the bKash/Nagad app.</p>
+<h3 class="text-[11px] font-bold text-yellow-300 mt-3"><i class="fa-solid fa-clock"></i> PENDING</h3>
+<div id="fpend" class="text-[12px] mt-2 space-y-2">Loadingâ€¦</div>
+<h3 class="text-[11px] font-bold text-slate-400 mt-3">Recent decided</h3>
+<div id="fhist" class="text-[11px] mt-2 space-y-1 text-slate-400">â€”</div>
+</div>
+<a href="dashboard.html" class="block text-center text-[12px] text-slate-400 mt-4">â† Back to Store</a>
+</div></div>
+
+<script src="firebase-config.js"></script>
+<script>
+const ADMINS=['gourobsarkar99@gmail.com','mdswampodsarkar@gmail.com'];
+function lock(){ firebase.auth().signOut().then(()=>location.reload()); }
+function show(){document.getElementById('gate').style.display='none';document.getElementById('panel').style.display='block';loadAll();loadFunds();loadCats();addPkgRow();addPkgRow()}
+firebase.auth().onAuthStateChanged(u=>{
+ if(u && ADMINS.includes(u.email)) show();
+ else if(u){ alert('This email is not an admin'); firebase.auth().signOut(); }
+});
+function tab(t){['P','U','F','C'].forEach(x=>document.getElementById('tab'+x).style.display='none');document.getElementById('tab'+t.toUpperCase()).style.display='block'}
+async function authLogin(){try{const c=await firebase.auth().signInWithEmailAndPassword(document.getElementById('aemail').value.trim(),document.getElementById('apass').value);if(!ADMINS.includes(c.user.email)){alert('This email is not an admin');await firebase.auth().signOut()}else show()}catch(e){alert('Login fail: '+e.message)}}
+function addPkgRow(l='',p=''){
+ const d=document.createElement('div'); d.className='flex gap-2';
+ d.innerHTML=`<input class="field plabel" placeholder="Plan (e.g. 1 Hours)" value="${l}"><input type="number" class="field pprice" placeholder="à§³" value="${p}" style="max-width:110px"><button onclick="this.parentElement.remove()" class="text-red-400 px-2"><i class="fa-solid fa-xmark"></i></button>`;
+ document.getElementById('pkgs').appendChild(d);
+}
+async function addCat(){
+ const name=document.getElementById('cn').value.trim(), key=(document.getElementById('ck').value.trim()||name).toLowerCase().replace(/[^a-z0-9]+/g,'');
+ if(!name||!key)return alert('Enter name + key');
+ try{await fbDB().ref('categories/'+key).set({name,time:Date.now()});document.getElementById('cn').value='';document.getElementById('ck').value='';loadCats()}catch(e){alert('Fail: '+e.message)}
+}
+async function loadCats(){
+ try{
+  const v=await fbGet('categories');
+  const box=document.getElementById('clist'), sel=document.getElementById('pc');
+  if(!v){box.innerHTML='(empty)';sel.innerHTML='<option value="">â€”</option>';return}
+  box.innerHTML=Object.entries(v).map(([k,c])=>`<div class="bg-black/30 border border-white/10 rounded-lg p-2 flex justify-between items-center"><span>â€¢ ${c.name} <span class="text-slate-500">(${k})</span></span><button onclick="delItem('categories','${k}')" class="text-red-400 text-[11px]">Delete</button></div>`).join('');
+  sel.innerHTML=Object.entries(v).map(([k,c])=>`<option value="${k}">${c.name}</option>`).join('');
+ }catch(e){document.getElementById('clist').innerHTML='Load fail: '+e.message}
+}
+
+async function uploadToImgbb(file){
+  const fd=new FormData(); fd.append('image',file);
+  const res=await fetch('https://api.imgbb.com/1/upload?key='+firebaseConfig.imgbbKey,{method:'POST',body:fd});
+  const j=await res.json();
+  if(!j.data||!j.data.url) throw new Error((j.error&&j.error.message)||'imgbb upload failed');
+  return j.data.url;
+}
+function pickImg(inp){
+ const f=inp.files[0]; if(!f)return;
+ const r=new FileReader(); r.onload=e=>{document.getElementById('pimgPrev').src=e.target.result;document.getElementById('pimgPrev').style.display='block';document.getElementById('pimgTxt').textContent=f.name}; r.readAsDataURL(f);
+}
+function urlPrev(v){ if(v&&/^https:\/\//.test(v)){document.getElementById('pimgPrev').src=v;document.getElementById('pimgPrev').style.display='block';document.getElementById('pimgTxt').textContent='URL image'} }
+async function addProduct(){
+ const pkgs=[...document.querySelectorAll('#pkgs > div')].map(d=>({label:d.querySelector('.plabel').value.trim(),price:parseFloat(d.querySelector('.pprice').value)||0})).filter(x=>x.label&&x.price>0);
+ const o={name:document.getElementById('pn').value.trim(),cat:document.getElementById('pc').value,status:document.getElementById('ps').value,note:document.getElementById('pnote').value.trim(),features:document.getElementById('pf').value.split('\n').map(s=>s.trim()).filter(Boolean),packages:pkgs,price:pkgs.length?pkgs[0].price:0,time:Date.now()};
+ if(!o.name)return alert('Enter name');
+ if(!o.cat)return alert('Select a category (add one in the Category tab first)');
+ if(!pkgs.length)return alert('Add at least 1 package');
+ const url=document.getElementById('pimgUrl').value.trim();
+ const f=document.getElementById('pimg').files[0];
+ try{
+  if(url){
+   if(!/^https:\/\//.test(url))return alert('URL must start with https://');
+   o.image=url;
+  } else if(f){
+   const up=firebase.storage().ref('products/'+Date.now()+'_'+f.name.replace(/[^a-zA-Z0-9.]/g,'_'));
+   await up.put(f);
+   o.image=await up.getDownloadURL();
+  }
+  await fbDB().ref('products').push(o);
+  alert('Saved!');
+  document.getElementById('pn').value='';document.getElementById('pkgs').innerHTML='';addPkgRow();
+  document.getElementById('pimg').value='';document.getElementById('pimgUrl').value='';
+  document.getElementById('pimgPrev').style.display='none';document.getElementById('pimgTxt').innerHTML='<i class="fa-solid fa-image"></i> Click to upload image';
+ }catch(e){alert('Save fail: '+e.message)}
+ loadAll();
+}
+async function addUpdate(){
+ const link=document.getElementById('ul').value.trim();
+  if(link&&!/^https:\/\//.test(link))return alert('Link must start with https://');
+ const o={title:document.getElementById('un').value.trim(),note:document.getElementById('uv').value.trim(),link,time:Date.now()};
+  if(!o.title)return alert('Enter title');
+ try{await fbDB().ref('updates').push(o);alert('Saved âœ…')}catch(e){alert('Save fail: '+e.message)}
+ loadAll();
+}
+function loadFunds(){
+ fbDB().ref('fundRequests').orderByChild('status').equalTo('pending').on('value',s=>{
+  const v=s.val(); const box=document.getElementById('fpend');
+  const n=v?Object.keys(v).length:0;
+  document.getElementById('fcount').textContent=n||'';
+  if(!v){box.innerHTML='No pending';return}
+  box.innerHTML=Object.entries(v).reverse().map(([k,x])=>`<div class="bg-black/30 border border-yellow-500/30 rounded-lg p-2">
+   <div><b>à§³${x.amount}</b> via ${x.method} â€¢ ${x.txn||'no-trx'}</div>
+   <div class="text-slate-400 text-[11px]">${x.email||''} â€¢ ${x.time?new Date(x.time).toLocaleString():''}</div>
+   <div class="flex gap-2 mt-2"><button onclick="approveFund('${k}','${x.uid}',${x.amount})" class="flex-1 bg-green-500 text-black font-bold py-1.5 rounded-lg text-[12px]"><i class="fa-solid fa-check"></i> Approve</button><button onclick="rejectFund('${k}')" class="flex-1 bg-red-500/20 border border-red-500/50 text-red-300 py-1.5 rounded-lg text-[12px]"><i class="fa-solid fa-xmark"></i> Reject</button></div>
+  </div>`).join('');
+ });
+ fbDB().ref('fundRequests').orderByChild('time').limitToLast(8).on('value',s=>{
+  const v=s.val(); if(!v)return;
+  document.getElementById('fhist').innerHTML=Object.values(v).reverse().filter(x=>x.status!=='pending').slice(0,8).map(x=>`â€¢ à§³${x.amount} ${x.email||''} â€” <b>${x.status}</b>`).join('<br>')||'â€”';
+ });
+}
+async function approveFund(key,uid,amount){
+ if(!confirm('Approve à§³'+amount+' and add to wallet?'))return;
+ try{
+  await fbDB().ref('wallets/'+uid).transaction(b=>(parseFloat(b)||0)+parseFloat(amount));
+  await fbDB().ref('fundRequests/'+key).update({status:'approved',by:firebase.auth().currentUser.email,at:Date.now()});
+ }catch(e){alert('Fail: '+e.message)}
+}
+async function rejectFund(key){
+ if(!confirm('Reject?'))return;
+ try{await fbDB().ref('fundRequests/'+key).update({status:'rejected',by:firebase.auth().currentUser.email,at:Date.now()})}catch(e){alert('Fail: '+e.message)}
+}
+async function loadAll(){
+ try{
+  const p=await fbGet('products'), u=await fbGet('updates');
+  renderList('plist',p,'name'); renderList('ulist',u,'title',true);
+ }catch(e){ document.getElementById('plist').innerHTML='Load fail: '+e.message; document.getElementById('ulist').innerHTML='Load fail: '+e.message; }
+}
+function renderList(id,obj,label,withDel){
+ const el=document.getElementById(id);
+ if(!obj){el.innerHTML='(empty â€” add your first entry)';return}
+ el.innerHTML=Object.entries(obj).reverse().slice(0,20).map(([k,v])=>`<div class="bg-black/30 border border-white/10 rounded-lg p-2 flex justify-between items-center"><span>â€¢ ${v[label]||'?'} ${v.price?'â€” à§³'+v.price:''}</span><button onclick="delItem('${id==='plist'?'products':'updates'}','${k}')" class="text-red-400 text-[11px]">Delete</button></div>`).join('');
+}
+async function delItem(path,key){ if(!confirm('Delete?'))return; try{await fbDB().ref(path+'/'+key).remove();loadAll();loadCats()}catch(e){alert('Delete fail: '+e.message)} }
+</script></body></html>
+
+
+
