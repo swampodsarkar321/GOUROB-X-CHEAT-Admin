@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="bn"><head><meta charset="UTF-8"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin | GOUROB X CHEAT</title><link rel="icon" type="image/jpeg" href="IMG-20260805-WA0005.jpg"><script src="https://cdn.tailwindcss.com"></script>
+<title>Admin | GOUROB X CHEAT</title><link rel="icon" type="image/jpeg" href="IMG-20260805-WA0005.jpg">
+<meta name="theme-color" content="#05070f">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<script src="pwa.js"></script><script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -8,6 +12,12 @@
 
 <style>body{background:#05070f;color:#e8eef7}.box{max-width:480px;margin:0 auto;min-height:100vh;padding:16px 12px 60px}.glass{background:rgba(16,24,45,.9);border:1px solid rgba(255,255,255,.1);border-radius:16px}.field{width:100%;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:10px;font-size:13px;color:#fff;outline:none}.field:focus{border-color:#00f0ff}label{font-size:10px;font-weight:800;color:#8a96b0}.imgup{width:100%;background:rgba(0,0,0,.45);border:1px dashed rgba(0,240,255,.4);border-radius:12px;padding:14px;font-size:13px;color:#9fb;cursor:pointer}.imgup:hover{background:rgba(0,240,255,.08)}</style></head>
 <body><div class="box">
+<div id="pwaBar" style="display:none" class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[92%] max-w-[440px] z-[70] glass rounded-2xl p-3 items-center gap-3">
+<img src="icon-192.png" class="w-11 h-11 rounded-xl" alt="app">
+<div class="flex-1 text-[12px]"><b>Install Admin App</b><br><span class="text-slate-400">Add to home screen</span></div>
+<button onclick="pwaInstall()" class="bg-cyan-400 text-black text-[12px] font-bold px-4 py-2 rounded-xl">INSTALL</button>
+<button onclick="pwaDismiss()" class="text-slate-500 px-1"><i class="fa-solid fa-xmark"></i></button>
+</div>
 <img src="IMG-20260805-WA0005.jpg" alt="GOUROB X CHEAT" class="w-16 h-16 rounded-2xl object-cover border border-red-500/60 mx-auto">
 <h1 class="text-center font-black tracking-widest mt-2">GOUROB <span class="text-red-500">X</span> CHEAT <span class="text-cyan-300 text-sm">ADMIN</span></h1>
 <p class="text-center text-[11px] text-slate-400">Separate from store &#8226; Admins only &#8226; Legal products/updates only</p>
