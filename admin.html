@@ -30,6 +30,7 @@
 <button onclick="tab('u')" class="flex-1 py-2 rounded-xl bg-white/5 border border-white/15 text-[12px] font-bold"><i class="fa-solid fa-cloud-arrow-down"></i> Updates</button>
 <button onclick="tab('f')" class="flex-1 py-2 rounded-xl bg-white/5 border border-white/15 text-[12px] font-bold"><i class="fa-solid fa-sack-dollar"></i> Funds <span id="fcount" class="bg-red-500 text-white text-[10px] px-1.5 rounded-full"></span></button>
 <button onclick="tab('o')" class="flex-1 py-2 rounded-xl bg-white/5 border border-white/15 text-[12px] font-bold"><i class="fa-solid fa-cart-shopping"></i> Orders <span id="ocount" class="bg-red-500 text-white text-[10px] px-1.5 rounded-full"></span></button>
+<button onclick="tab('s')" class="flex-1 py-2 rounded-xl bg-white/5 border border-white/15 text-[12px] font-bold"><i class="fa-solid fa-users"></i> Users <span id="ucount" class="bg-red-500 text-white text-[10px] px-1.5 rounded-full"></span></button>
 <button onclick="lock()" class="px-4 py-2 rounded-xl bg-red-500/15 border border-red-500/40 text-[12px]">Lock</button>
 </div>
 
@@ -84,6 +85,10 @@
 <h3 class="text-[11px] font-bold text-slate-400 mt-3">Recent decided</h3>
 <div id="fhist" class="text-[11px] mt-2 space-y-1 text-slate-400">&#8212;</div>
 </div>
+<div id="tabS" class="glass p-4 mt-3" style="display:none">
+<h2 class="font-bold text-[13px]"><i class="fa-solid fa-users"></i> All Users (ban blocks app access)</h2>
+<div id="userlist" class="text-[12px] mt-2 space-y-2">Loading...</div>
+</div>
 <div id="tabO" class="glass p-4 mt-3" style="display:none">
 <h2 class="font-bold text-[13px]"><i class="fa-solid fa-cart-shopping"></i> Orders (approve to deliver, reject refunds wallet)</h2>
 <h3 class="text-[11px] font-bold text-yellow-300 mt-3"><i class="fa-solid fa-clock"></i> PENDING</h3>
@@ -98,12 +103,12 @@
 <script>
 const ADMINS=['gourobsarkar99@gmail.com','mdswampodsarkar@gmail.com'];
 function lock(){ firebase.auth().signOut().then(()=>location.reload()); }
-function show(){document.getElementById('gate').style.display='none';document.getElementById('panel').style.display='block';loadAll();loadFunds();loadOrders();loadCats();addPkgRow();addPkgRow()}
+function show(){document.getElementById('gate').style.display='none';document.getElementById('panel').style.display='block';loadAll();loadFunds();loadOrders();loadUsers();loadCats();addPkgRow();addPkgRow()}
 firebase.auth().onAuthStateChanged(u=>{
  if(u && ADMINS.includes(u.email)) show();
  else if(u){ alert('This email is not an admin'); firebase.auth().signOut(); }
 });
-function tab(t){['P','U','F','C','O'].forEach(x=>document.getElementById('tab'+x).style.display='none');document.getElementById('tab'+t.toUpperCase()).style.display='block'}
+function tab(t){['P','U','F','C','O','S'].forEach(x=>document.getElementById('tab'+x).style.display='none');document.getElementById('tab'+t.toUpperCase()).style.display='block'}
 async function authLogin(){try{const c=await firebase.auth().signInWithEmailAndPassword(document.getElementById('aemail').value.trim(),document.getElementById('apass').value);if(!ADMINS.includes(c.user.email)){alert('This email is not an admin');await firebase.auth().signOut()}else show()}catch(e){alert('Login fail: '+e.message)}}
 function addPkgRow(l='',p=''){
  const d=document.createElement('div'); d.className='flex gap-2';
@@ -227,6 +232,22 @@ async function rejectOrder(key,uid,total){
   await fbDB().ref('wallets/'+uid).transaction(b=>(parseFloat(b)||0)+parseFloat(total));
   await fbDB().ref('orders/'+key).update({status:'rejected',by:firebase.auth().currentUser.email,at:Date.now()});
  }catch(e){alert('Fail: '+e.message)}
+}
+function loadUsers(){
+ fbDB().ref('users').on('value',s=>{
+  const v=s.val(); const box=document.getElementById('userlist');
+  if(!v){box.innerHTML='No users yet';return}
+  document.getElementById('ucount').textContent=Object.keys(v).length||'';
+  box.innerHTML=Object.entries(v).reverse().map(([uid,x])=>`<div class="bg-black/30 border border-white/10 rounded-lg p-2">
+   <div class="flex justify-between items-center"><b>${(x.name||'').replace(/</g,'&lt;')}</b>${x.banned?'<span class="text-red-400 text-[10px] font-bold">BANNED</span>':'<span class="text-green-400 text-[10px] font-bold">ACTIVE</span>'}</div>
+   <div class="text-slate-400 text-[11px]">${x.email||''}${x.phone?' - '+x.phone:''}</div>
+   <div class="mt-2"><button onclick="banUser('${uid}',${!x.banned})" class="w-full ${x.banned?'bg-green-500/20 border border-green-500/50 text-green-300':'bg-red-500/20 border border-red-500/50 text-red-300'} py-1.5 rounded-lg text-[12px] font-bold">${x.banned?'Unban':'Ban'}</button></div>
+  </div>`).join('');
+ });
+}
+async function banUser(uid,ban){
+ if(!confirm((ban?'Ban':'Unban')+' this user?'))return;
+ try{await fbDB().ref('users/'+uid).update(ban?{banned:true,bannedAt:Date.now()}:{banned:false})}catch(e){alert('Fail: '+e.message)}
 }
 async function loadAll(){
  try{
