@@ -10,3 +10,5 @@ self.addEventListener('fetch',e=>{
   return r;
  }).catch(()=>caches.match('./index.html'))));
 });
+
+self.addEventListener('notificationclick',e=>{e.notification.close();e.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(cs=>{for(const c of cs){try{if(c.url.indexOf('admin')>-1||c.url.indexOf('index')>-1)return c.focus()}catch(_){}}return clients.openWindow('./index.html')}))});

@@ -118,7 +118,8 @@ function lock(){ firebase.auth().signOut().then(()=>location.reload()); }
 let alertOn=false, seenF=null, seenO=null;
 async function enableAlerts(){try{if(!('Notification' in window))return alert('No notification support');const r=await Notification.requestPermission();if(r==='granted'){alertOn=true;document.getElementById('bellBtn').innerHTML='<i class="fa-solid fa-bell"></i> ON';beep()}else alert('Blocked: allow notifications in browser site settings')}catch(e){alert('Fail: '+e.message)}}
 function beep(){try{const C=window.AudioContext||window.webkitAudioContext;const c=new C();const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.value=.12;o.start();setTimeout(()=>{o.frequency.value=660},160);setTimeout(()=>{o.stop();try{c.close()}catch(e){}},450)}catch(e){}}
-function notifyMe(t,b){if(!alertOn)return;try{if(Notification.permission!=='granted')return;const n=new Notification(t,{body:b,icon:'icon-192.png'});n.onclick=function(){window.focus();n.close()}}catch(e){}beep()}
+function swFallback(t,b){try{const n=new Notification(t,{body:b,icon:'icon-192.png'});n.onclick=function(){window.focus();n.close()}}catch(e){}}
+function notifyMe(t,b){if(!alertOn)return;beep();try{if(!('Notification' in window)||Notification.permission!=='granted')return;const o={body:b,icon:'icon-192.png',vibrate:[200,100,200],tag:'gx-'+Date.now()};if(navigator.serviceWorker&&navigator.serviceWorker.controller){navigator.serviceWorker.ready.then(function(reg){reg.showNotification(t,o)}).catch(function(){swFallback(t,b)})}else swFallback(t,b)}catch(e){}}
 function show(){document.getElementById('gate').style.display='none';document.getElementById('panel').style.display='block';loadAll();loadFunds();loadOrders();loadUsers();loadCats();addPkgRow();addPkgRow()}
 firebase.auth().onAuthStateChanged(u=>{
  if(u && ADMINS.includes(u.email)) show();
