@@ -227,7 +227,7 @@ function loadFunds(){
   box.innerHTML=Object.entries(v).reverse().map(([k,x])=>`<div class="bg-black/30 border border-yellow-500/30 rounded-lg p-2">
    <div><b>\u09f3${x.amount}</b> via ${x.method} \u2022 ${x.txn||'no-trx'}</div>
    <div class="text-slate-400 text-[11px]">${x.email||''} \u2022 ${x.time?new Date(x.time).toLocaleString():''}</div>
-   <div class="flex gap-2 mt-2"><button onclick="approveFund('${k}','${x.uid}',${x.amount})" class="flex-1 bg-green-500 text-black font-bold py-1.5 rounded-lg text-[12px]"><i class="fa-solid fa-check"></i> Approve</button><button onclick="rejectFund('${k}')" class="flex-1 bg-red-500/20 border border-red-500/50 text-red-300 py-1.5 rounded-lg text-[12px]"><i class="fa-solid fa-xmark"></i> Reject</button></div>
+   <div class="flex gap-2 mt-2"><button onclick="approveFund('${k}','${x.uid}',${x.amount})" class="flex-1 bg-green-500 text-black font-bold py-1.5 rounded-lg text-[12px]"><i class="fa-solid fa-check"></i> Approve</button><button onclick="rejectFund('${k}','${x.uid}')" class="flex-1 bg-red-500/20 border border-red-500/50 text-red-300 py-1.5 rounded-lg text-[12px]"><i class="fa-solid fa-xmark"></i> Reject</button></div>
   </div>`).join('');
  });
  fbDB().ref('fundRequests').orderByChild('time').limitToLast(8).on('value',s=>{
@@ -240,11 +240,12 @@ async function approveFund(key,uid,amount){
  try{
   await fbDB().ref('wallets/'+uid).transaction(b=>(parseFloat(b)||0)+parseFloat(amount));
   await fbDB().ref('fundRequests/'+key).update({status:'approved',by:firebase.auth().currentUser.email,at:Date.now()});
+  await fbDB().ref('userFunds/'+uid+'/'+key).update({status:'approved'}).catch(()=>{});
  }catch(e){alert('Fail: '+e.message)}
 }
-async function rejectFund(key){
+async function rejectFund(key,uid){
  if(!confirm('Reject?'))return;
- try{await fbDB().ref('fundRequests/'+key).update({status:'rejected',by:firebase.auth().currentUser.email,at:Date.now()})}catch(e){alert('Fail: '+e.message)}
+ try{await fbDB().ref('fundRequests/'+key).update({status:'rejected',by:firebase.auth().currentUser.email,at:Date.now()});await fbDB().ref('userFunds/'+uid+'/'+key).update({status:'rejected'}).catch(()=>{})}catch(e){alert('Fail: '+e.message)}
 }
 function loadOrders(){
  fbDB().ref('orders').orderByChild('status').equalTo('pending').on('value',s=>{
@@ -257,7 +258,7 @@ function loadOrders(){
    <div class="text-cyan-300 font-bold">Total: \u09f3${x.total||0}</div>
    <div class="text-slate-400 text-[11px]">${x.email||''} - ${x.time?new Date(x.time).toLocaleString():''}</div>
    <input id="key_${k}" class="field mt-2" placeholder="Paste license key here" style="padding:8px;font-size:12px">
-   <div class="flex gap-2 mt-2"><button onclick="approveOrder('${k}',document.getElementById('key_${k}').value)" class="flex-1 bg-green-500 text-black font-bold py-1.5 rounded-lg text-[12px]"><i class="fa-solid fa-check"></i> Approve + Send Key</button><button onclick="rejectOrder('${k}','${x.uid}',${x.total||0})" class="flex-1 bg-red-500/20 border border-red-500/50 text-red-300 py-1.5 rounded-lg text-[12px]"><i class="fa-solid fa-xmark"></i> Reject + Refund</button></div>
+   <div class="flex gap-2 mt-2"><button onclick="approveOrder('${k}','${x.uid}',document.getElementById('key_${k}').value)" class="flex-1 bg-green-500 text-black font-bold py-1.5 rounded-lg text-[12px]"><i class="fa-solid fa-check"></i> Approve + Send Key</button><button onclick="rejectOrder('${k}','${x.uid}',${x.total||0})" class="flex-1 bg-red-500/20 border border-red-500/50 text-red-300 py-1.5 rounded-lg text-[12px]"><i class="fa-solid fa-xmark"></i> Reject + Refund</button></div>
   </div>`).join('');
  });
  fbDB().ref('orders').orderByChild('time').limitToLast(8).on('value',s=>{
@@ -265,17 +266,18 @@ function loadOrders(){
   document.getElementById('ohist').innerHTML=Object.values(v).reverse().filter(x=>x.status!=='pending').slice(0,8).map(x=>`\u2022 ${x.product||''} (${x.plan||''} x ${x.qty||1}) - \u09f3${x.total||0} - <b>${x.status}</b>`).join('<br>')||'\u2014';
  });
 }
-async function approveOrder(key,licenseKey){
+async function approveOrder(key,uid,licenseKey){
  licenseKey=(licenseKey||'').trim();
  if(!licenseKey){alert('Paste the license key first');return}
  if(!confirm('Approve + send this key to user?'))return;
- try{await fbDB().ref('orders/'+key).update({status:'approved',key:licenseKey,by:firebase.auth().currentUser.email,at:Date.now()})}catch(e){alert('Fail: '+e.message)}
+ try{await fbDB().ref('orders/'+key).update({status:'approved',key:licenseKey,by:firebase.auth().currentUser.email,at:Date.now()});await fbDB().ref('userOrders/'+uid+'/'+key).update({status:'approved',key:licenseKey}).catch(()=>{})}catch(e){alert('Fail: '+e.message)}
 }
 async function rejectOrder(key,uid,total){
  if(!confirm('Reject + refund \u09f3'+total+' to wallet?'))return;
  try{
   await fbDB().ref('wallets/'+uid).transaction(b=>(parseFloat(b)||0)+parseFloat(total));
   await fbDB().ref('orders/'+key).update({status:'rejected',by:firebase.auth().currentUser.email,at:Date.now()});
+  await fbDB().ref('userOrders/'+uid+'/'+key).update({status:'rejected'}).catch(()=>{});
  }catch(e){alert('Fail: '+e.message)}
 }
 function loadUsers(){
